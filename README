@@ -1,0 +1,8 @@
+---- About ----
+
+nim-fnmatch is a  Nim module for filename matching with UNIX shell patterns. It is based on the fnmatch module in
+the Python standard library.
+
+---- License ----
+
+nim-fnmatch is released under the MIT open source license.
