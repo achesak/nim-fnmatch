@@ -5,13 +5,13 @@
 # Released under the MIT open source license.
 
 
-## fnmatch is a Nim module for filename matching with UNIX shell patterns. It is based on 
+## fnmatch is a Nim module for filename matching with UNIX shell patterns. It is based on
 ## Python's fnmatch module in the standard library.
 ##
 ## Examples:
 ##
 ## .. code-block:: nimrod
-##    
+##
 ##    # Test if a filename matches a pattern, ignoring case.
 ##    var filename : string = "EXAMPLE.TXT"
 ##    var pattern : string = "*.txt"
@@ -19,7 +19,7 @@
 ##    echo(matches) # outputs true
 ##
 ## .. code-block:: nimrod
-##    
+##
 ##    # Test if a filename matches a pattern, taking into account case.
 ##    # Using same filename and pattern as previous example.
 ##    matches = fnmatchcase(filename, pattern)
@@ -32,7 +32,7 @@
 ##    var filtered : seq[string] = filter(names, "*.t*)
 ##    echo(filtered)
 ##    # outputs @["test.txt, "FILES.TXT", "fnmatch.testfile"]
-##    
+##
 ##    # filter() can also filter based on case, if true is given as the third parameter.
 ##    filtered = filter(names, "*.t*", true)
 ##    echo(filtered)
@@ -41,6 +41,7 @@
 
 import strutils
 import re
+import unicode
 
 
 proc fnmatchEscapeRe(s: string): string =
@@ -56,78 +57,78 @@ proc fnmatchEscapeRe(s: string): string =
     return escaped
 
 
-proc translate*(pattern : string): string = 
+proc translate*(pattern : string): string =
     ## Returns the shell-style ``pattern`` converted to a regular expression.
-    
+
     var i : int = 0
     var j : int = 0
     var n : int = len(pattern)
     var c : string = ""
     var inside : string = ""
-    var result : string = ""
-    
+    var output : string = ""
+
     while i < n:
         c = "" & pattern[i]
         i += 1
-        
+
         if c == "*":
-            result &= ".*"
-        
+            output &= ".*"
+
         elif c == "?":
-            result &= "."
-        
+            output &= "."
+
         elif c == "[":
             j = i
-            
+
             if j < n and pattern[j] == '!':
                 j += 1
             if j < n and pattern[j] == ']':
                 j += 1
-            
+
             while j < n and pattern[j] != ']':
                 j += 1
-            
-            
+
+
             if j >= n:
-                result &= "\\["
+                output &= "\\["
             else:
                 inside = pattern[i..j+1].replace("\\", "\\\\")
                 i = j + 1
-                
+
                 if inside[0] == '!':
                     inside = "^" & inside[1..high(inside)]
                 elif inside[0] == '^':
                     inside = "\\" & inside
-                
-                result = result & "[" & inside & "]"
-        
+
+                output = output & "[" & inside & "]"
+
         else:
-            result &= fnmatchEscapeRe(c)
+            output &= fnmatchEscapeRe(c)
 
-    return result & "\\Z(?ms)"
+    return output & "\\Z(?ms)"
 
 
-proc fnmatch*(filename : string, pattern : string): bool = 
+proc fnmatch*(filename : string, pattern : string): bool =
     ## Tests whether ``filename`` matches ``pattern``, returning ``True`` or ``False``.
-    
-    var f : string = filename.toLower()
-    var p : string = pattern.toLower()
-    
+
+    var f : string = unicode.toLower(filename)
+    var p : string = unicode.toLower(pattern)
+
     return re.match(f, re(translate(p)))
 
 
-proc fnmatchcase*(filename : string, pattern : string): bool = 
+proc fnmatchcase*(filename : string, pattern : string): bool =
     ## Tests whether ``filename`` matches ``pattern``, returning ``True`` or ``False``;
     ## the comparison is case-sensitive.
-    
+
     return re.match(filename, re(translate(pattern)))
 
 
-proc filter*(names : seq[string], pattern : string, casesensitive : bool = false): seq[string] = 
+proc filter*(names : seq[string], pattern : string, casesensitive : bool = false): seq[string] =
     ## Returns the subset of the list of ``names`` that match ``pattern``.
-    
+
     var r : seq[string] = @[]
-    
+
     for name in names:
         if casesensitive:
             if fnmatchcase(name, pattern):
@@ -135,5 +136,5 @@ proc filter*(names : seq[string], pattern : string, casesensitive : bool = false
         else:
             if fnmatch(name, pattern):
                 r.add(name)
-    
+
     return r
