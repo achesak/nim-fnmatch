@@ -13,9 +13,9 @@
 ## .. code-block:: nimrod
 ##
 ##    # Test if a filename matches a pattern, ignoring case.
-##    var filename : string = "EXAMPLE.TXT"
-##    var pattern : string = "*.txt"
-##    var matches : bool = fnmatch(filename, pattern)
+##    let filename: string = "EXAMPLE.TXT"
+##    let pattern: string = "*.txt"
+##    var matches: bool = fnmatch(filename, pattern)
 ##    echo(matches) # outputs true
 ##
 ## .. code-block:: nimrod
@@ -28,8 +28,8 @@
 ## .. code-block:: nimrod
 ##
 ##    # Filter a list of names to get a subset that matches a pattern.
-##    var names : seq[string] = @["list", "of", "test.txt", "FILES.TXT", "fnmatch.nim", "fnmatch.testfile"]
-##    var filtered : seq[string] = filter(names, "*.t*)
+##    let names: seq[string] = @["list", "of", "test.txt", "FILES.TXT", "fnmatch.nim", "fnmatch.testfile"]
+##    var filtered: seq[string] = filter(names, "*.t*)
 ##    echo(filtered)
 ##    # outputs @["test.txt, "FILES.TXT", "fnmatch.testfile"]
 ##
@@ -57,15 +57,15 @@ proc fnmatchEscapeRe(s: string): string =
     return escaped
 
 
-proc translate*(pattern : string): string =
+proc translate*(pattern: string): string =
     ## Returns the shell-style ``pattern`` converted to a regular expression.
 
-    var i : int = 0
-    var j : int = 0
-    var n : int = len(pattern)
-    var c : string = ""
-    var inside : string = ""
-    var output : string = ""
+    var i: int = 0
+    var j: int = 0
+    var n: int = len(pattern)
+    var c: string = ""
+    var inside: string = ""
+    var output: string = ""
 
     while i < n:
         c = "" & pattern[i]
@@ -108,26 +108,26 @@ proc translate*(pattern : string): string =
     return output & "\\Z(?ms)"
 
 
-proc fnmatch*(filename : string, pattern : string): bool =
+proc fnmatch*(filename: string, pattern: string): bool =
     ## Tests whether ``filename`` matches ``pattern``, returning ``True`` or ``False``.
 
-    var f : string = unicode.toLower(filename)
-    var p : string = unicode.toLower(pattern)
+    let f: string = unicode.toLower(filename)
+    let p: string = unicode.toLower(pattern)
 
     return re.match(f, re(translate(p)))
 
 
-proc fnmatchcase*(filename : string, pattern : string): bool =
+proc fnmatchcase*(filename: string, pattern: string): bool =
     ## Tests whether ``filename`` matches ``pattern``, returning ``True`` or ``False``;
     ## the comparison is case-sensitive.
 
     return re.match(filename, re(translate(pattern)))
 
 
-proc filter*(names : seq[string], pattern : string, casesensitive : bool = false): seq[string] =
+proc filter*(names: seq[string], pattern: string, casesensitive: bool = false): seq[string] =
     ## Returns the subset of the list of ``names`` that match ``pattern``.
 
-    var r : seq[string] = @[]
+    var r: seq[string] = @[]
 
     for name in names:
         if casesensitive:
