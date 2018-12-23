@@ -39,6 +39,7 @@
 ##    # outputs @["test.txt", "fnmatch.testfile"]
 
 
+import future
 import strutils
 import re
 import unicode
@@ -126,15 +127,9 @@ proc fnmatchcase*(filename: string, pattern: string): bool =
 
 proc filter*(names: seq[string], pattern: string, casesensitive: bool = false): seq[string] =
     ## Returns the subset of the list of ``names`` that match ``pattern``.
+    
+    if casesensitive:
+        return lc[name | (name <- names, fnmatchcase(name, pattern)), string]
+    else:
+        return lc[name | (name <- names, fnmatch(name, pattern)), string]
 
-    var r: seq[string] = @[]
-
-    for name in names:
-        if casesensitive:
-            if fnmatchcase(name, pattern):
-                r.add(name)
-        else:
-            if fnmatch(name, pattern):
-                r.add(name)
-
-    return r
