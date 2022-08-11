@@ -39,10 +39,10 @@
 ##    # outputs @["test.txt", "fnmatch.testfile"]
 
 
-import future
 import strutils
 import re
 import unicode
+import lc
 
 
 proc fnmatchEscapeRe(s: string): string =
