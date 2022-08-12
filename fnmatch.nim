@@ -42,8 +42,7 @@
 import strutils
 import re
 import unicode
-import lc
-
+import sugar
 
 proc fnmatchEscapeRe(s: string): string =
     ## Internal proc. Escapes `s` so that it is matched verbatim when used as a regular
@@ -129,7 +128,9 @@ proc filter*(names: seq[string], pattern: string, casesensitive: bool = false): 
     ## Returns the subset of the list of ``names`` that match ``pattern``.
     
     if casesensitive:
-        return lc[name | (name <- names, fnmatchcase(name, pattern)), string]
+        return collect(for name in names:
+            if fnmatchcase(name, pattern): name)
     else:
-        return lc[name | (name <- names, fnmatch(name, pattern)), string]
+        return collect(for name in names:
+            if fnmatch(name, pattern): name)
 
